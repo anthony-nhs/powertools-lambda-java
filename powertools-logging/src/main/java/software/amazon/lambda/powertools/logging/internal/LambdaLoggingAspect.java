@@ -131,15 +131,17 @@ public final class LambdaLoggingAspect {
             proceedArgs = logEvent(pjp);
         }
 
+        if (logging.clearState()) {
+            ThreadContext.clearMap();
+        }
+        
         if (!logging.correlationIdPath().isEmpty()) {
             proceedArgs = captureCorrelationId(logging.correlationIdPath(), pjp);
         }
 
         Object proceed = pjp.proceed(proceedArgs);
 
-        if (logging.clearState()) {
-            ThreadContext.clearMap();
-        }
+
 
         coldStartDone();
         return proceed;

@@ -360,6 +360,17 @@ class LambdaLoggingAspectTest {
                 .containsEntry("correlation_id", eventId);
     }
 
+    @ParameterizedTest
+    @Event(value = "apiGatewayProxyEventV1.json", type = APIGatewayProxyRequestEvent.class)
+    void shouldLogCorrelationIdOnAPIGatewayProxyRequestEventWithClearSet(APIGatewayProxyRequestEvent event) {
+        RequestHandler<APIGatewayProxyRequestEvent, Object> handler = new PowerLogToolApiGatewayRestApiCorrelationIdAndClear();
+        handler.handleRequest(event, context);
+
+        assertThat(ThreadContext.getImmutableContext())
+                .hasSize(1)
+                .containsEntry("correlation_id", event.getRequestContext().getRequestId());
+    }
+
     @Test
     void shouldLogAndClearLogContextOnEachRequest() throws IOException {
         requestHandler = new PowertoolsLogEnabledWithClearState();
